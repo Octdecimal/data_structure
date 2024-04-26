@@ -2,6 +2,11 @@
 #include <iostream>
 
 int main() {
-    Graph g;
+    int n, e;
+    while (true) {
+        std::cout << "Please input n (0 ~ 64)\n=> ";
+        std::cin >> n;
+        Graph G(n);
+    }
     return 0;
 }

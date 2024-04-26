@@ -19,7 +19,7 @@ private:
     int vertex;
     int edge;
     int edgeNumLimit;
-    void ELcalculate();
+    void ENLcal();
     void setEdge();
 
     int AdjMatrix[64][64];

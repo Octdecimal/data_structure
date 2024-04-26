@@ -3,7 +3,7 @@
 #include <random>
 #include <queue>
 
-void Graph::ELcalculate () {
+void Graph::ENLcal() {
     double value = 1;
     for(int index = 0; index < 2; index++) {
         value *= (value - index);
@@ -18,7 +18,7 @@ void Graph::setEdge() {
 }
 
 Graph::Graph (int n) : vertex(n) {
-    ELcalculate();
+    ENLcal();
     std::cout << "the range of edge is from 0 to " << edgeNumLimit << ".\n"; 
     do {
         setEdge();
