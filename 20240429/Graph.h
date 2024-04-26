@@ -18,7 +18,7 @@ private:
 
     int vertex;
     int edge;
-    int edgeLimit;
+    int edgeNumLimit;
     void ELcalculate();
     void setEdge();
 

@@ -10,7 +10,7 @@ void Graph::ELcalculate () {
     }
     value /= 4;
     // C(vertex, 2)/2 => vertex * (vertex - 1) / 4
-    edgeLimit = (int)value;
+    edgeNumLimit = (int)value;
 }
 
 void Graph::setEdge() {
@@ -19,16 +19,16 @@ void Graph::setEdge() {
 
 Graph::Graph (int n) : vertex(n) {
     ELcalculate();
-    std::cout << "the range of edge is from 0 to " << edgeLimit << ".\n"; 
+    std::cout << "the range of edge is from 0 to " << edgeNumLimit << ".\n"; 
     do {
         setEdge();
-        if(edge > edgeLimit) {
+        if(edge > edgeNumLimit) {
             std::cout << "the number is too large, please retype.\n";
         }
         if(edge < 0) {
             std::cout << "the number is too small, please retype.\n";
         }
-    }while ((edge > edgeLimit) || (edge < 0));
+    }while ((edge > edgeNumLimit) || (edge < 0));
 }
 
 void Graph::AMmaker() {
