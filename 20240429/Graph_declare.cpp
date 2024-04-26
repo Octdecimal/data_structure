@@ -2,53 +2,62 @@
 #include <iostream>
 #include <random>
 #include <queue>
+#include <fstram>
 
 void Graph::ENLcal() {
     double value = 1;
     for(int index = 0; index < 2; index++) {
-        value *= (value - index);
+        value *= (vertex - index);
     }
-    value /= 4;
-    // C(vertex, 2)/2 => vertex * (vertex - 1) / 4
+    value /= 2;
     edgeNumLimit = (int)value;
 }
 
 void Graph::setEdge() {
-    std::cin >> edge; 
+    std::cin >> edge;
 }
 
-Graph::Graph (int n) : vertex(n) {
+Graph::Graph(int n) : vertex(n) {
     ENLcal();
-    std::cout << "the range of edge is from 0 to " << edgeNumLimit << ".\n"; 
+    int e = 0;
+    std::cout << "Please input e (0 ~ " << edgeNumLimit << ")\n=> "; 
     do {
         setEdge();
         if(edge > edgeNumLimit) {
-            std::cout << "the number is too large, please retype.\n";
+            std::cout << "the number is too large, please retype.\n=> ";
         }
         if(edge < 0) {
-            std::cout << "the number is too small, please retype.\n";
+            std::cout << "the number is too small, please retype.\n=> ";
         }
     }while ((edge > edgeNumLimit) || (edge < 0));
+    AMmaker();
 }
 
 void Graph::AMmaker() {
-    int total_size = (vertex * (vertex - 1)) / 2;
-    int list[total_size];
+    total_size = (vertex * (vertex - 1)) / 2;
+    int *list = new int[total_size];
 
-    random_device rd;
-    mt19937 gen(rd());
-    limit = 1 << (total_size) - 1;
-    uniform_int_distribution<int> dist(0, limit);
-    int random = dist(gen);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    int limit = 1 << (total_size) - 1;
+    std::uniform_int_distribution<int> dist(0, limit);
 
-    for(int i = 0; i < total_size; i++) {
-        list[i] = (random >> (total_size - i - 1)) & 1;
-    }
+    int pos_count;
+    int random;
+    do {
+        pos_count = 0;
+        random = dist(gen);
+        for (int i = 0; i < total_size; i++) {
+            list[i] = (random >> (total_size - i - 1)) & 1;
+            if (list[i] == 1) {
+                pos_count++;
+            }
+        }
+    } while (pos_count != edge);
 
     for(int i = 0; i < vertex; i++) {
         AdjMatrix[i][i] = 0;
     }
-
     int row = 0;
     int col = row + 1;
     int resist = vertex - 1;
@@ -68,6 +77,22 @@ void Graph::AMmaker() {
             col++;
         }
     }
+
+    fstream file = open("matrix.csv", std::ios::out, std::ios::trunc);
+    for(int i = 0; i < vertex; i++) {
+        for(int j = 0; j < vertex; j++) {
+            if(i == 0) {
+                file << "," << j;
+            } else {
+                if(j == 0) {
+                    file << i;
+                }
+                file << "," << AdjMatrix[i][j];
+            }
+        }
+        file << "\n";
+    }
+    ALmaker();
 }
 
 void Graph::ALmaker() {
@@ -105,7 +130,10 @@ void Graph::ALprinter() {
     for(int i = 0; i < vertex; i++) {
         List *current = &AdjList[i];
         while(current != nullptr) {
-            std::cout << current->v << " -> ";
+            std::cout << current->v;
+            if (current->next != nullptr) {
+                std::cout << " -> ";
+            }
             current = current->next;
         }
         std::cout << "\n";
@@ -161,7 +189,7 @@ void Graph::BFS() {
         }
     }
 
-    BFStree(Barray);
+    tree(Barray);
 }
 
 void Graph::BFSVisit(fs *Barray, int u, int &time) {
@@ -185,10 +213,16 @@ void Graph::BFSVisit(fs *Barray, int u, int &time) {
     }
 }
 
-void Graph::tree(fs *Barray) {
+void Graph::tree(fs *array) {
     for(int i = 0; i < vertex; i++) {
-        if(Barray[i].pi != -1) {
-            std::cout << i << " -> " << Barray[i].pi << "\n";
+        if(array[i].pi != -1) {
+            std::cout << array[i].pi << " -> " << i << "\n";
         }
     }
+}
+
+Graph::~Graph() {
+    delete[] Barray;
+    delete[] Darray;
+    delete[] list;
 }

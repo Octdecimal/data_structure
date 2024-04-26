@@ -19,17 +19,24 @@ private:
     int vertex;
     int edge;
     int edgeNumLimit;
+
+    int total_size;
+
+    fs* Darray = nullptr;
+    fs* Barray = nullptr;
+    int* list = nullptr;
+
     void ENLcal();
     void setEdge();
 
-    int AdjMatrix[64][64];
+    int AdjMatrix[64][64] = { 0 };
     List AdjList[64];
 
     void AMmaker();
     void ALmaker();
 
-    void DFSVisit(fs*, int, int);
-    void BFSVisit(fs*, int, int);
+    void DFSVisit(fs*, int, int&);
+    void BFSVisit(fs*, int, int&);
     void tree(fs*);
 public:
     Graph(int = 0);
@@ -40,6 +47,8 @@ public:
     void DFS();
 
     void BFS();
-}
+
+    ~Graph();
+};
 
 #endif
