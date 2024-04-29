@@ -2,7 +2,8 @@
 #include <iostream>
 #include <random>
 #include <queue>
-#include <fstram>
+#include <fstream>
+//#include <crtdbg.h>
 
 void Graph::ENLcal() {
     double value = 1;
@@ -18,6 +19,7 @@ void Graph::setEdge() {
 }
 
 Graph::Graph(int n) : vertex(n) {
+    FScount = 0;
     ENLcal();
     int e = 0;
     std::cout << "Please input e (0 ~ " << edgeNumLimit << ")\n=> "; 
@@ -39,8 +41,9 @@ void Graph::AMmaker() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    int limit = 1 << (total_size) - 1;
+    int limit = (1 << total_size) - 1;
     std::uniform_int_distribution<int> dist(0, limit);
+    // reference by: https://learn.microsoft.com/en-us/cpp/standard-library/random?view=msvc-170
 
     int pos_count;
     int random;
@@ -55,9 +58,6 @@ void Graph::AMmaker() {
         }
     } while (pos_count != edge);
 
-    for(int i = 0; i < vertex; i++) {
-        AdjMatrix[i][i] = 0;
-    }
     int row = 0;
     int col = row + 1;
     int resist = vertex - 1;
@@ -77,20 +77,22 @@ void Graph::AMmaker() {
             col++;
         }
     }
+    delete[] list;
 
-    fstream file = open("matrix.csv", std::ios::out, std::ios::trunc);
+    std::fstream file;
+    file.open("matrix.csv", std::ios::out | std::ios::trunc);
+    for (int i = 0; i < vertex; i++) {
+        file << "," << i;
+    }
+    file << "\n";
     for(int i = 0; i < vertex; i++) {
         for(int j = 0; j < vertex; j++) {
-            if(i == 0) {
-                file << "," << j;
-            } else {
-                if(j == 0) {
-                    file << i;
-                }
-                file << "," << AdjMatrix[i][j];
+            if(j == 0) {
+                file << i;
             }
+            file << "," << AdjMatrix[i][j]; 
         }
-        file << "\n";
+        file << ",\n";
     }
     ALmaker();
 }
@@ -155,6 +157,7 @@ void Graph::DFS() {
         }
     }
 
+    FScount = 1;
     tree(Darray);
 }
 
@@ -189,6 +192,7 @@ void Graph::BFS() {
         }
     }
 
+    FScount = 2;
     tree(Barray);
 }
 
@@ -216,13 +220,65 @@ void Graph::BFSVisit(fs *Barray, int u, int &time) {
 void Graph::tree(fs *array) {
     for(int i = 0; i < vertex; i++) {
         if(array[i].pi != -1) {
-            std::cout << array[i].pi << " -> " << i << "\n";
+            treeMatrix[array[i].pi][i] = 1;
         }
+    }
+    for (int i = 0; i < vertex; i++) {
+        for (int j = 0; j < vertex; j++) {
+            std::cout << treeMatrix[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+
+    std::fstream file;
+    if (FScount == 1) {
+        file.open("DFSMatrix.csv", std::ios::out | std::ios::trunc);
+    }
+    if (FScount == 2) {
+        file.open("BFSMatrix.csv", std::ios::out | std::ios::trunc);
+    }
+    FSMatrix(&file);
+
+    if (FScount == 1) {
+        delete[] Darray;
+    }
+    if (FScount == 2) {
+        delete[] Barray;
     }
 }
 
+void Graph::FSMatrix(std::fstream* file) {
+    for (int i = 0; i < vertex; i++) {
+        *file << "," << i;
+    }
+    *file << "\n";
+    for (int i = 0; i < vertex; i++) {
+        for (int j = 0; j < vertex; j++) {
+            if (j == 0) {
+                *file << i;
+            }
+            *file << "," << treeMatrix[i][j];
+            treeMatrix[i][j] = 0;
+        }
+        *file << "\n";
+    }
+    file->close();
+}
+
+
 Graph::~Graph() {
-    delete[] Barray;
-    delete[] Darray;
-    delete[] list;
+    for (int i = 0; i < vertex; i++) {
+        List* current = &AdjList[i];
+        while (current != nullptr) {
+            List* temp = current;
+            current = current->next;
+            //if (_CrtIsValidHeapPointer(temp)) { // ugly processing method
+                delete temp;
+            //}
+            // if use command `g++ -o` on window terminal, can't use <crtdbg.h> and _CrtIsValidHeapPointer
+            
+            // what is _CrtIsValidHeapPointer()?, reference by: https://learn.microsoft.com/zh-tw/cpp/c-runtime-library/reference/crtisvalidheappointer?view=msvc-170
+            // some information about _CrtIsValidHeapPointer(), reference by: https://stackoverflow.com/questions/64418624/why-do-i-get-crtisvalidheappointerblock-and-or-is-block-type-validheader-b
+        }
+    }
 }

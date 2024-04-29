@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <fstream>
 class Graph {
 private:
     struct List
@@ -29,8 +30,9 @@ private:
     void ENLcal();
     void setEdge();
 
-    int AdjMatrix[64][64] = { 0 };
-    List AdjList[64];
+    int AdjMatrix[256][256] = { 0 };
+    int treeMatrix[256][256] = { 0 };
+    List AdjList[256];
 
     void AMmaker();
     void ALmaker();
@@ -38,6 +40,9 @@ private:
     void DFSVisit(fs*, int, int&);
     void BFSVisit(fs*, int, int&);
     void tree(fs*);
+
+    int FScount;
+    void FSMatrix(std::fstream*);
 public:
     Graph(int = 0);
 
