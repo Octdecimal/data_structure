@@ -3,7 +3,7 @@
 #include <random>
 #include <queue>
 #include <fstream>
-//#include <crtdbg.h>
+#include <crtdbg.h>
 
 void Graph::ENLcal() {
     double value = 1;
@@ -21,7 +21,6 @@ void Graph::setEdge() {
 Graph::Graph(int n) : vertex(n) {
     FScount = 0;
     ENLcal();
-    int e = 0;
     std::cout << "Please input e (0 ~ " << edgeNumLimit << ")\n=> "; 
     do {
         setEdge();
@@ -45,18 +44,33 @@ void Graph::AMmaker() {
     std::uniform_int_distribution<int> dist(0, limit);
     // reference by: https://learn.microsoft.com/en-us/cpp/standard-library/random?view=msvc-170
 
+    std::uniform_int_distribution<int> dit(0, total_size - 1);
+    int modify;
     int pos_count;
     int random;
-    do {
-        pos_count = 0;
-        random = dist(gen);
-        for (int i = 0; i < total_size; i++) {
-            list[i] = (random >> (total_size - i - 1)) & 1;
-            if (list[i] == 1) {
-                pos_count++;
-            }
+    pos_count = 0;
+    random = dist(gen);
+    for (int i = 0; i < total_size; i++) {
+        list[i] = (random >> (total_size - i - 1)) & 1;
+        if (list[i] == 1) {
+            pos_count++;
         }
-    } while (pos_count != edge);
+    }
+    
+    while (pos_count < edge) {
+        modify = dit(gen);
+        if (list[modify] == 0) {
+            list[modify] = 1;
+            pos_count++;
+        }
+    }
+    while (pos_count > edge) {
+        modify = dit(gen);
+        if (list[modify] == 1) {
+            list[modify] = 0;
+            pos_count--;
+        }
+    }
 
     int row = 0;
     int col = row + 1;
@@ -272,11 +286,9 @@ Graph::~Graph() {
         while (current != nullptr) {
             List* temp = current;
             current = current->next;
-            //if (_CrtIsValidHeapPointer(temp)) { // ugly processing method
+            if (_CrtIsValidHeapPointer(temp)) { // ugly processing method
                 delete temp;
-            //}
-            // if use command `g++ -o` on window terminal, can't use <crtdbg.h> and _CrtIsValidHeapPointer
-            
+            }
             // what is _CrtIsValidHeapPointer()?, reference by: https://learn.microsoft.com/zh-tw/cpp/c-runtime-library/reference/crtisvalidheappointer?view=msvc-170
             // some information about _CrtIsValidHeapPointer(), reference by: https://stackoverflow.com/questions/64418624/why-do-i-get-crtisvalidheappointerblock-and-or-is-block-type-validheader-b
         }
